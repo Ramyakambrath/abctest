@@ -1,4 +1,4 @@
-import React, { Fragment,useEffect } from 'react';
+import React, { Fragment } from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -50,7 +50,7 @@ border-top: 1px solid #eee;
 `
 
 const handleChange=(e)=>{
-    const item = e.target.value;
+  // const item = e.target.value;
     const isChecked = e.target.checked;
     setChecked(({ ...checkedItems,[e.target.value]: isChecked}));
 }

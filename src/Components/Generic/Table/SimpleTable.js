@@ -13,8 +13,6 @@ import ViewColumnOutlinedIcon from '@material-ui/icons/ViewColumnOutlined';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import Checkbox from '@material-ui/core/Checkbox';
 import PropTypes from 'prop-types';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
 import FilterListIcon from '@material-ui/icons/FilterList';
@@ -65,7 +63,7 @@ function EnhancedTableHead(props) {
 
     const getActiveColumns = (columnList) => {
 
-        const activeList = Object.keys(filterOBject(columnList, column => column == true));
+        const activeList = Object.keys(filterOBject(columnList, column => column === true));
         setActiveColumnsList(activeList);
 
     }

@@ -11,10 +11,11 @@ import Burger from './Components/Generic/Burger/Burger'
 import NavbarMenuList from './Components/Children/Inventory/NavbarMenuList'
 import Content from './Components/Children/Inventory/Content'
 import styled from 'styled-components'
-import ItemMain from './Components/Children/Inventory/item/ItemMain';
 import CustomizeColumns from './Components/Generic/CustomizeColumns/CustomizeColumns';
 import ItemMain2 from './Components/Children/Inventory/item/ItemMain2';
 import NewItem from './Components/Children/Inventory/item/NewItems';
+import store from './store';
+import { Provider} from 'react-redux'
 
 
 
@@ -34,6 +35,7 @@ min-height:100%;
 
   return (
     <ThemeProvider theme={theme}>
+    <Provider store ={store}>
       <>
       <BrowserRouter>
       <Switch>
@@ -55,6 +57,7 @@ min-height:100%;
 
 
       </>
+      </Provider>
     </ThemeProvider>
 
   );

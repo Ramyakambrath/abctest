@@ -1,6 +1,5 @@
 import React,{useRef, Fragment} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import {  Divider } from '@material-ui/core';
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
@@ -12,7 +11,9 @@ import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import { useOnClickOutside } from '../../../hooks';
 import ClearIcon from '@material-ui/icons/Clear';
 import AddValueToDropDown from './AddValueToDropDown';
+import DropdownContext from '../../Context/DropdownContext'
 import Popper from '@material-ui/core/Popper';
+
 
 
 const useStyles = makeStyles(theme => ({
@@ -46,6 +47,10 @@ const useStyles = makeStyles(theme => ({
    
     color: 'rgba(0,0,0,0.36)'
   },
+  '&:hover':{
+    color:'white',
+    
+  },
 
   '&:focus': {
     outline: "none",
@@ -70,7 +75,12 @@ const useStyles = makeStyles(theme => ({
      borderLeft: '0px hidden',
      backgroundColor: 'hsl(0,0%,100%)',
      bordercolor: 'hsl(0,0%,80%)',
+     
    //  borderRadius: '0px 4px 4px 0px',
+   '&:hover':{
+    color:'black',
+   
+  },
    
    },
   icon:{
@@ -117,18 +127,35 @@ const useStyles = makeStyles(theme => ({
       
     }
   },
-  list: {
+  listUp: {
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     border: '1px solid #e0e0e0',
     boxShadow: '0px 5px 15px 5px #bdbdbd',
-    // position:'relative !important',
-    // zIndex:'1000 !important',
+    top: '0px',
+    left: '0px', 
+    transform: 'translateY(-130%)',
+    background:'white',
+
 
 
   },
+  listDown: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    border: '1px solid #e0e0e0',
+    boxShadow: '0px 5px 15px 5px #bdbdbd',
+    top: '0px',
+    left: '0px',
+ 
+
+
+  },
+  
   listItem:{
     paddingTop: '0',
     paddingBottom: '0',
@@ -156,6 +183,12 @@ const useStyles = makeStyles(theme => ({
     '&:hover': {
       color: "black",
       borderBottom: '2px solid',
+      '& .MuiSvgIcon-root':{
+        borderColor: 'white',
+      },
+      '& #dropdown':{
+        borderColor: 'white',
+      }
     },
    
   }
@@ -163,19 +196,26 @@ const useStyles = makeStyles(theme => ({
 }))
 
 
-const ListValue = ({ items, dropDownField,toggleDropdownStatus,setSelectedValue,toggleDropdownIconStatus, ...props }) => {
+const ListValue = ({ itemsdb,mousePosition, dropDownField,toggleDropdownStatus,setSelectedValue,toggleDropdownIconStatus,...props }) => {
   const [item, setSelectedItem] = React.useState('');
+  const items=itemsdb.map(item=>item.name)
   const [filteredData,setFilteredData]= React.useState(items);
   const [showManageForm, setManageForm] = React.useState(false);
+  const centerY = document.documentElement.clientHeight / 2;
+ // const centerY = 1000;
   
+  console.log('mousePosition',mousePosition,centerY)
 
-  const handleListItemClick=(e,index)=>{
+  const handleListItemClick=(index)=>{
+
   
-    
     setSelectedValue(index);
     toggleDropdownStatus();
 
   }
+
+
+ 
 
   const handleChange = (e) => {
 
@@ -228,9 +268,11 @@ const ListValue = ({ items, dropDownField,toggleDropdownStatus,setSelectedValue,
 
   return (
     <Fragment>
-    {showManageForm? <AddValueToDropDown items={items} dropDownField={dropDownField} handleCloseForm={handleCloseForm} toggleDropdownStatus={toggleDropdownStatus}/>:
+      <DropdownContext.Provider value={{handleListItemClick:handleListItemClick}}>
+    {showManageForm? <AddValueToDropDown items={items} itemsdb={itemsdb} dropDownField={dropDownField} handleCloseForm={handleCloseForm} toggleDropdownStatus={toggleDropdownStatus}/>:
     <div style={{ display: 'flex', flexDirection: 'column', width: '300px', marginTop: '5px',position:'absolute',zIndex:'10000',background:'white'}}>
-      <List component="nav" aria-label="main mailbox folders" className={classes.list} >
+      
+      <List component="nav" aria-label="main mailbox folders" className={Math.abs(mousePosition)>centerY?classes.listUp:classes.listDown}  >
         <input
           id={dropDownField}
           type='text'
@@ -239,7 +281,7 @@ const ListValue = ({ items, dropDownField,toggleDropdownStatus,setSelectedValue,
           onChange={(e)=>handleChange(e)}
         />
         {filteredData.map((item,index) => (
-          <ListItem button className={classes.listItem} onClick={event => handleListItemClick(event, index)} key={item}>
+          <ListItem button className={classes.listItem} onClick={event => handleListItemClick( index)} key={index}>
             <ListItemText primary={item} className={classes.listText} />
             {/* <ListItemIcon className={classes.icon}>
               <DeleteOutlineIcon  />
@@ -247,26 +289,32 @@ const ListValue = ({ items, dropDownField,toggleDropdownStatus,setSelectedValue,
           </ListItem>
         ))}
         <Divider className={classes.hr}/>
+        {dropDownField ==='Manufacturer' || dropDownField ==='Brand'?
         <ListItem button style={{ paddingTop: '0', paddingBottom: '0',position:'relative',zIndex:'10001' }} onClick={handeManage}>
           <ListItemIcon className={classes.settingsIcon} >
             <SettingsIcon />
           </ListItemIcon>
           <ListItemText primary={`Manage ${dropDownField}`} className={classes.settingsText}/>
-        </ListItem>
+        </ListItem>:null}
       </List>
-   
-    </div>}
+     
+    </div>
+    }
+    </DropdownContext.Provider>
     </Fragment>
   )
 
 }
 
 
-export default function Dropdown({ items, dropDownField,marginValue, ...props }) {
+export default function Dropdown({ items, itemsdb,dropDownField,marginValue,...props }) {
   const classes = useStyles();
   const [data, setData] = React.useState('');
+  const [mousePosition, setmousePosition] = React.useState('');
   const [dropDownStatus, setDropdownStatus] = React.useState(false);
   const [dropDownIconStatus, setDropdownIconStatus] = React.useState(false);
+  
+
   // const [anchorEl, setAnchorEl] = React.useState(null);
 
   const node = useRef();
@@ -277,7 +325,8 @@ export default function Dropdown({ items, dropDownField,marginValue, ...props })
  
   const setSelectedValue=(index)=>{
 
-    setData(items[index])
+   
+    setData(itemsdb[index].name)
   }
 
   useOnClickOutside(node, (event) => {
@@ -295,7 +344,11 @@ export default function Dropdown({ items, dropDownField,marginValue, ...props })
     setDropdownIconStatus(!dropDownStatus);
   }
 
+ const handleMouseMove=(e)=>{
+  // console.log(e.clientY, e.target.offsetTop)
+  setmousePosition(e.clientY)
 
+ }
   
   // const open = Boolean(anchorEl);
   // const id = open ? 'simple-popover' : undefined;
@@ -309,9 +362,10 @@ export default function Dropdown({ items, dropDownField,marginValue, ...props })
 
   return (
      <div  ref={node} style={{width:'350px',margin:`${marginValue}`}} >
-     <label className={classes.label}>Manufacturer</label>
-     <div className={classes.divcontainer}>   
+     <label className={classes.label}> {dropDownField}</label>
+     <div className={classes.divcontainer} onMouseMove={handleMouseMove}>   
       <input
+        id='dropdown'
         type='text'
         value={data}
         placeholder={`Select or Add ${dropDownField}`}
@@ -327,8 +381,9 @@ export default function Dropdown({ items, dropDownField,marginValue, ...props })
         anchorEl={anchorEl}
        
       > */}
-      {dropDownStatus ? <ListValue items={items} dropDownField={dropDownField} toggleDropdownStatus={toggleDropdownStatus} setSelectedValue={setSelectedValue} toggleDropdownIconStatus={toggleDropdownIconStatus}/> : null}
+      {dropDownStatus ? <ListValue itemsdb={itemsdb} dropDownField={dropDownField} toggleDropdownStatus={toggleDropdownStatus} setSelectedValue={setSelectedValue} toggleDropdownIconStatus={toggleDropdownIconStatus} mousePosition={mousePosition}/> : null}
       {/* </Popper> */}
+    
     </div>
   )
 }

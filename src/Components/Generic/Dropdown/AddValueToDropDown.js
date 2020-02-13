@@ -1,19 +1,5 @@
-import React, { useRef,useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
-import { Divider } from '@material-ui/core';
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemText from '@material-ui/core/ListItemText'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import SettingsIcon from '@material-ui/icons/Settings';
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import { useOnClickOutside } from '../../../hooks';
-import ClearIcon from '@material-ui/icons/Clear';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import ReactDOM from 'react-dom';
 import Modal from './Modal'
 
@@ -194,7 +180,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 
-const ListValue = ({ items, dropDownField,handleCloseForm, ...props }) => {
+const ListValue = ({ items, itemsdb, dropDownField,handleCloseForm, ...props }) => {
     const [openManageForm, setOpenManageForm] = React.useState(false); 
 
   //  const reference = useRef();
@@ -230,22 +216,20 @@ useEffect(()=>{
     }
 },[openManageForm])
 
-    const classes = useStyles();
-
     
     return (
         <React.Fragment >
-         {!openManageForm?ReactDOM.createPortal(<Modal items={items} dropDownField={dropDownField} handleClose={handleClose} />,document.body):<React.Fragment/>}
+         {!openManageForm?ReactDOM.createPortal(<Modal items={items} itemsdb={itemsdb} dropDownField={dropDownField} handleClose={handleClose} />,document.body):<React.Fragment/>}
         </React.Fragment>
     )
 
 }
 
 
-export default function AddValueToDropDown({ items, dropDownField, handleCloseForm,...props }) {
-    const classes = useStyles();
-    const [data, setData] = React.useState('');
-    const [dropDownStatus, setDropdownStatus] = React.useState(false);
+export default function AddValueToDropDown({ items, itemsdb,dropDownField, handleCloseForm,...props }) {
+  
+    // const [data, setData] = React.useState('');
+    // const [dropDownStatus, setDropdownStatus] = React.useState(false);
 
   //  const node = useRef();
 
@@ -260,9 +244,9 @@ export default function AddValueToDropDown({ items, dropDownField, handleCloseFo
 
 
     return (
-        <div   style={{ width: '500px'}} >
+        <div style={{ width: '500px'}} >
             <div style={{ display: 'flex' }}>
-             <ListValue items={items} dropDownField={dropDownField} handleCloseForm={handleCloseForm} />
+             <ListValue items={items} itemsdb={itemsdb} dropDownField={dropDownField} handleCloseForm={handleCloseForm} />
             </div>
 
         </div>

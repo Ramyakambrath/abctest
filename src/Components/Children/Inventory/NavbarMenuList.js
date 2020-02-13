@@ -1,7 +1,7 @@
 import React from 'react'
 import { faPlus, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import Nav from '../../Generic/Navbar/Nav';
-import styled from 'styled-components';
+
 
 
 export default function NavbarMenuList() {

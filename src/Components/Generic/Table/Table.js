@@ -3,12 +3,9 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Checkbox from '@material-ui/core/Checkbox';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
 import styled from 'styled-components';
 import ViewColumnOutlinedIcon from '@material-ui/icons/ViewColumnOutlined';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 import TableColumns from './TableColumns'
 import { Tooltip } from '@material-ui/core';
 import {filterOBject} from '../../../HelperFunctions/helper'
@@ -86,7 +83,7 @@ export default function Table({headCells,...props}) {
 
     const getActiveColumns=(columnList)=>{
 
-        const activeList=Object.keys(filterOBject(columnList,column =>column == true));
+        const activeList=Object.keys(filterOBject(columnList,column =>column === true));
         setActiveColumnsList(activeList);
        
        }
@@ -110,7 +107,7 @@ export default function Table({headCells,...props}) {
                         />
                     </TableCell>
                     {headCells.map((headCell,i) => (          
-                        activeColumnsList.includes(headCell.label) || activeColumnsList.length ==0? 
+                        activeColumnsList.includes(headCell.label) || activeColumnsList.length === 0? 
                         <TableCell component="th"
                             key={headCell.id}
                             align={headCell.numeric ? 'right' : 'left'}

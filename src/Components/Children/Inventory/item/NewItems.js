@@ -2,7 +2,6 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormHelperText from '@material-ui/core/FormHelperText';
@@ -12,16 +11,23 @@ import FormLabel from '@material-ui/core/FormLabel';
 import DropZone from '../../../Generic/DropZone/DropZone';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import Button from '@material-ui/core/Button';
 import { Tooltip } from '@material-ui/core';
 import Checkbox from '@material-ui/core/Checkbox';
-import MenuItem from '@material-ui/core/MenuItem';
-import NativeSelect from '@material-ui/core/NativeSelect';
-import InputLabel from '@material-ui/core/InputLabel';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
-import Chip from '@material-ui/core/Chip';
 import Dropdown from '../../../Generic/Dropdown/Dropdown';
+import ItemContext from '../../../Context/ItemContext';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import ClearIcon from '@material-ui/icons/Clear';
+import { useDispatch, useSelector } from "react-redux";
+import { getManufacturers } from '../../../../Actions/manufacturerActions';
+import { getBrands } from '../../../../Actions/brandActions';
+import { getAccountSales,getAccountCost,getAccountInventory } from '../../../../Actions/accountActions';
+import { getVendors } from '../../../../Actions/vendorActions';
+import { addItem } from '../../../../Actions/itemListActions';
 
 const useStyles = makeStyles(theme => ({
 
@@ -232,7 +238,40 @@ const useStyles = makeStyles(theme => ({
       width: '.7em',
       height: '.7em'
     }
-  }
+  },
+  selectButton: {
+    color: '#fff',
+    backgroundColor: '#2fa3e6',
+    borderColor: '#2fa3e6',
+    textTransform: 'none',
+    marginTop: '20px',
+    marginLeft: '25px',
+    minWidth: '10px',
+
+    "&.MuiButton-root": {
+        lineHeight: '1',
+        fontSize: '0.7rem',
+        minWidth: '54px'
+    }
+
+
+},
+cancelButton: {
+    color: '#616161',
+    borderColor: '#2fa3e6',
+    textTransform: 'none',
+    marginTop: '20px',
+    marginLeft: '25px',
+    minWidth: '10px',
+
+    "&.MuiButton-root": {
+        lineHeight: '1',
+        fontSize: '0.7rem',
+        minWidth: '54px'
+    }
+
+
+},
 
 }));
 
@@ -251,19 +290,72 @@ const useStyles = makeStyles(theme => ({
 //   }
 // });
 
-export default function NewItem() {
-  const classes = useStyles();
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
+
+export default function NewItem({...props}) {
+
+  const classes = useStyles();
+  const dispatch = useDispatch();
+
+ 
+  
   const units = [{title:'box'}, {title:'cm'}, {title:'dz'},{title:'ft'}, {title:'g'}, {title:'kg'},{title:'lb'}, {title:'mg'}, {title:'m'}]
-  const manufacturer=['M1', 'M2', 'M3']
+ // const manufacturer=['M1', 'M2', 'M3']
 
   const [value, setValue] = React.useState('female');
   const [unitData, setUnit] = React.useState(units);
+  const [manufacturerData, setManufacturer] = React.useState([]);
+  const [newItem, setnewItem] = React.useState('');
+  const [SnackbarOpen,setSnackbarOpen]= React.useState(false);
+  const [alertMessage,setAlertMessage]= React.useState('');
+  const manufacturer= useSelector(state => state.manufacturer.manufacturerList);
+  const manufacturerDB= useSelector(state => state.manufacturer.manufacturerListdb);
+
+  const brand= useSelector(state => state.brand.brandList);
+  const brandDB= useSelector(state => state.brand.brandListdb);
+
+  const accountSales= useSelector(state => state.account.accountListSales);
+  const accountCost= useSelector(state => state.account.accountListCost);
+  const accountInventory= useSelector(state => state.account.accountListInventory);
+
+  const vendor= useSelector(state => state.vendor.vendorList);
+  console.log('vendor',vendor)
+ 
+  React.useEffect(()=>{ 
+    
+    dispatch(getManufacturers());
+    dispatch(getBrands());
+    dispatch(getAccountSales())
+    dispatch(getAccountCost())
+    dispatch(getAccountInventory())
+    dispatch(getVendors())
+
+
+     setManufacturer(manufacturer) 
+
+   
+   
+    
+    return()=>{
+      
+    
+  }
+  },manufacturer,brand)
+    
+
+  
+  
 
   const handleChange = event => {
     setValue(event.target.value);
   };
 
+  const handleItemSave=(e)=>{
+    dispatch(addItem())
+  }
   const tooltipText = {
     ISBN: 'Thirteen digit unique commercial book identifier(International Standard Book Number)',
     SKU: 'The Stock Keeping Unit of the item',
@@ -280,16 +372,42 @@ export default function NewItem() {
     event.stopPropagation();
 
     let newUnitList=unitData.filter(item=>item.title!==option);
-    console.log(newUnitList)
     setUnit(newUnitList);
     
 
   }
+  const handleSnackbarClose = (event, reason) => {
+
+    if (reason === 'clickaway') {
+        return;
+    }
+    setSnackbarOpen(!SnackbarOpen)
+
+}
+const handleNewItemClose=()=>{
+
+  props.history.push('/Items/Items')
   
-  //,'dz','ft','g','in','kg','km','lb','mg','m','pcs'
+}
+
+
 
   return (
+    <ItemContext.Provider  value={{
+        inputdata: manufacturer,
+        inputdataDb:manufacturerDB,
+        setManufacturer:setManufacturer,
+        setSnackbarOpen:setSnackbarOpen,
+        SnackbarOpen:SnackbarOpen,
+        setAlertMessage:setAlertMessage,
+     
+
+    }}>
     <form className={classes.root} noValidate autoComplete="off">
+    <div style={{ display:'flex', justifyContent:'space-between' ,width: '100%' }}>
+        <h3 style={{ marginLeft:'3%', color:"rgba(0,0,0,0.54)",fontWeight: "300" }}>New Item</h3>
+        <ClearIcon style={{ paddingRight: '40px',marginTop:'20px',cursor:'pointer' }} onClick={handleNewItemClose}/>
+        </div>
       <div style={{ width: '100%' }}>
         <Paper className={classes.paper} style={{ background: '#fbfafa' }}>
           <div className={classes.marginControl}>
@@ -354,7 +472,7 @@ export default function NewItem() {
                 id="unit"
                 options={unitData}
                 getOptionLabel={option=> option.title}
-                style={{ width: 300 }}
+                style={{ width: 350 }}
                 classes={{option:classes.option,listbox:classes.listbox}}
                 renderOption={option => {
                   return (
@@ -441,7 +559,7 @@ export default function NewItem() {
 
                 />
               
-                <Dropdown dropDownField='Manufacturer' items={manufacturer} marginValue='15px'/>
+                <Dropdown dropDownField='Manufacturer' items={manufacturer} itemsdb={manufacturerDB} marginValue='15px' />
                 {/* <TextField
                   id="manufacturer"
                   label="Manufacturer"
@@ -525,7 +643,8 @@ export default function NewItem() {
                   }}
 
                 />
-                <TextField
+                <Dropdown dropDownField='Brand' items={brand} itemsdb={brandDB} marginValue='15px'/>
+                {/* <TextField
                   id="brand"
                   label="Brand"
                   style={{ margin: 15 }}
@@ -541,7 +660,7 @@ export default function NewItem() {
                     shrink: true,
                   }}
 
-                />
+                /> */}
                 <TextField
                   id="mpn"
                   label="MPN"
@@ -622,8 +741,8 @@ export default function NewItem() {
                   }}
                 />
                 {/* </MuiThemeProvider> */}
-
-                <TextField
+                <Dropdown dropDownField='Account Sales' itemsdb={accountSales} marginValue='15px'/>
+                {/* <TextField
                   id="account"
                   label="Account"
                   style={{ margin: 15 }}
@@ -639,7 +758,7 @@ export default function NewItem() {
                     shrink: true,
                   }}
 
-                />
+                /> */}
 
                 <TextField
                   id="description"
@@ -684,7 +803,8 @@ export default function NewItem() {
                   }}
 
                 />
-                <TextField
+                <Dropdown dropDownField='Account Cost' itemsdb={accountCost} marginValue='15px'/>
+                {/* <TextField
                   id="account"
                   label="Account"
                   style={{ margin: 15 }}
@@ -700,7 +820,7 @@ export default function NewItem() {
                     shrink: true,
                   }}
 
-                />
+                /> */}
                 <TextField
                   id="description"
                   label="Description"
@@ -743,7 +863,8 @@ export default function NewItem() {
 
               <div className={classes.inputField6} >
                 {/* <MuiThemeProvider theme={theme}> */}
-                <TextField
+                <Dropdown dropDownField='Inventory Account' itemsdb={accountInventory} marginValue='15px'/>
+                {/* <TextField
                   id="inventoryAccount"
                   label="Inventory Account"
                   style={{ margin: 15 }}
@@ -759,7 +880,7 @@ export default function NewItem() {
                     shrink: true,
 
                   }}
-                />
+                /> */}
               </div>
               <div className={classes.inputField6} >
                 <div >
@@ -821,8 +942,9 @@ export default function NewItem() {
 
                   />
                 </div>
-                <div style={{ paddingLeft: '60px' }}>
-                  <TextField
+                <div style={{ paddingLeft: '60px' }} >
+                <Dropdown dropDownField='Vendor' itemsdb={vendor} marginValue='15px'/>
+                  {/* <TextField
                     id="vendor"
                     label="Preferred Vendor"
                     style={{ margin: 15 }}
@@ -838,14 +960,22 @@ export default function NewItem() {
                       shrink: true,
                     }}
 
-                  />
+                  /> */}
                 </div>
               </div>
             </div>
           </div>
         </Paper>
+        <Button variant="contained" color="primary" className={classes.selectButton} onClick={handleItemSave}>Save</Button>
+        <Button variant="contained" color="default" className={classes.cancelButton} onClick={handleNewItemClose}>Cancel</Button>
       </div>
-
     </form>
+   
+    <Snackbar open={SnackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose} anchorOrigin={{vertical: 'top', horizontal:'right' }} key={'top','right'}>
+                <Alert onClose={handleSnackbarClose} severity="success">
+                {`${alertMessage} successfully`}
+               </Alert>
+        </Snackbar>
+    </ItemContext.Provider>
   );
 }

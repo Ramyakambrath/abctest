@@ -9,7 +9,7 @@ const useStyles = makeStyles(theme => ({
       },
       dropzone:{
         width:'200px',
-        marginRight:theme.spacing(40),
+        marginRight:theme.spacing(30),
         marginTop:theme.spacing(8),
         minHeight:'200px',
         height:'200px'
@@ -49,7 +49,7 @@ export default function DropZone() {
 
    const handleChange=(files)=>{
     setFiles(files)
-    console.log(files)
+    
       }
     return (
         <div className={classes.container}>
